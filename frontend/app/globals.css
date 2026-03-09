@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+    --clerk-color-background: #212126;
+  --clerk-color-neutral: white;
+  --clerk-color-primary: #FFFFFF;
+  --clerk-color-primary-foreground: black;
+  --clerk-color-foreground: white;
+  --clerk-color-input-foreground: white;
+  --clerk-color-input: #26262B;
 }
 
 @theme inline {
@@ -23,4 +30,14 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.dark {
+  --clerk-color-background: #212126;
+  --clerk-color-neutral: white;
+  --clerk-color-primary: #FFFFFF;
+  --clerk-color-primary-foreground: black;
+  --clerk-color-foreground: white;
+  --clerk-color-input-foreground: white;
+  --clerk-color-input: #26262B;
 }
