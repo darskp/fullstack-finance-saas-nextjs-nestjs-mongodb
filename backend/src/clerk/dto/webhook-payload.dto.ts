@@ -1,4 +1,9 @@
-import { IsString, IsOptional } from "class-validator";
+import { IsString, IsOptional, IsArray } from "class-validator";
+
+export class EmailAddress {
+  @IsString()
+  email_address: string;
+}
 
 export class ClerkUserCreatedDto {
 
@@ -12,5 +17,13 @@ export class ClerkUserCreatedDto {
   @IsOptional()
   @IsString()
   last_name?: string;
+
+  @IsOptional()
+  @IsArray()
+  email_addresses?: EmailAddress[];
+
+  @IsOptional()
+  @IsString()
+  image_url?: string;
 
 }

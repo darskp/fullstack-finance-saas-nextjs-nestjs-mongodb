@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Headers, BadRequestException, Req } from "@nestjs/common";
+import { Controller, Post, Body, Headers, BadRequestException } from "@nestjs/common";
 import { ClerkService } from "./clerk.service";
 import type { WebhookEvent, WebhookResponse } from "./interfaces/webhook-event.interface";
 
@@ -15,11 +15,13 @@ export class ClerkController {
         @Headers("svix-timestamp") svixTimestamp: string,
         @Headers("svix-signature") svixSignature: string,
     ): Promise<WebhookResponse> {
-         if (!svixId || !svixTimestamp || !svixSignature) {
-      throw new BadRequestException("Missing Svix webhook headers");
-    }
+        if (!svixId || !svixTimestamp || !svixSignature) {
+            throw new BadRequestException("Missing Svix webhook headers");
+        }
 
         const payload = JSON.stringify(body);
+        console.log("payload",payload);
+        
         //   const payload = req.rawBody
         const event = await this.clerkService.verifyWebhook(payload, {
             "svix-id": svixId,
@@ -27,12 +29,11 @@ export class ClerkController {
             "svix-signature": svixSignature,
         });
 
-        await this.clerkService.handleEvent(event as WebhookEvent);
+        const result = await this.clerkService.handleEvent(event as WebhookEvent);
 
         return {
             success: true,
-            message: "Webhook processed successfully"
+            message: result.message,
         };
-
     }
 }
