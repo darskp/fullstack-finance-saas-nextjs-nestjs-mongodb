@@ -24,3 +24,33 @@ export const SIDEBAR_CONSTANTS = [
     icon: TrendingDown,
   },
 ];
+
+export const INCOME_CATEGORY_CONSTANTS: {
+    value: string;
+    title: string;
+}[] = [
+  {
+    value: "business",
+    title: "Business",
+  },
+  {
+    value: "freelance",
+    title: "Freelance",
+  },
+  {
+    value: "salary",
+    title: "Salary",
+  },
+  {
+    value: "investment",
+    title: "Investment",
+  },
+  {
+    value: "rentalIncome",
+    title: "Rental Income",
+  },
+  {
+    value: "otherIncome",
+    title: "Other Income",
+  },
+];
