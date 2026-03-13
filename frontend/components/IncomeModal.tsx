@@ -18,8 +18,12 @@ import { INCOME_CATEGORY_CONSTANTS } from "@/utils/constants";
 import { Calendar } from "./ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ChevronDownIcon } from "lucide-react";
+import { ITransactionData } from "@/utils/types";
+import { toast } from "sonner";
 
-const IncomeModal = () => {
+const IncomeModal = ({ handleAddIncome }: {
+    handleAddIncome: (incomedata: ITransactionData) => void
+}) => {
     const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
     const [selectedEmoji, setSelectedEmoji] = useState<string>("🚀");
     const [title, setTitle] = useState("")
@@ -31,6 +35,18 @@ const IncomeModal = () => {
     const handleEmojiclick = (emjobj: { emoji: string }) => {
         setSelectedEmoji(emjobj.emoji)
         setShowEmojiPicker(false)
+    }
+
+    const handleAddIncomeBtn = () => {
+        const incomeData: ITransactionData = {
+            title, category, emoji: selectedEmoji, amount, date, transactionType: 'Income'
+        }
+        if(!title || !category || !amount || !date){
+            toast.error("Please fill all the fields")
+            return
+        }
+        console.log("inco",incomeData);
+        handleAddIncome(incomeData)
     }
 
     return (
@@ -130,7 +146,7 @@ const IncomeModal = () => {
                             Close
                         </Button>
                     </DialogClose>
-                    <Button className="cursor-pointer">
+                    <Button className="cursor-pointer" onClick={handleAddIncomeBtn}>
                         Add Income
                     </Button>
                 </DialogFooter>

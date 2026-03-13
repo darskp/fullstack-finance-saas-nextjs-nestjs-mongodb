@@ -1,5 +1,7 @@
-import Income from '@/components/Income'
+import Income from '@/components/Income';
 
-const IncomePage = () => <Income/>
+const UserIncome = async() => {
+    return(<Income/>)
+};
 
-export default IncomePage
+export default UserIncome;

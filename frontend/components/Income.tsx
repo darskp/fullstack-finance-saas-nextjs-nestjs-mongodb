@@ -1,13 +1,31 @@
+"use client"
+import { ITransactionData } from '@/utils/types';
 import IncomeModal from './IncomeModal';
 import { SquarePen, Trash2, TrendingUp } from 'lucide-react';
+import { toast } from 'sonner';
+import { AddIncome } from '@/services/income';
 
 const Income = () => {
+
+  const handleAddIncome = async (incomeObj: ITransactionData) => {
+    try {
+      const respose = await AddIncome(incomeObj)
+      console.log(respose)
+      if (respose) {
+        toast.success("Income added Successfully")
+      }
+    }
+    catch (error) {
+      toast.error("Error while adding income")
+      console.log("Error while adding income");
+    }
+  }
 
   return (
     <div className='w-[75%] ml-8 mt-6 mr-8'>
       <div className='flex w-full justify-between'>
         <h1 className='text-xl font-medium'>Incomes</h1>
-        <IncomeModal />
+        <IncomeModal handleAddIncome={handleAddIncome} />
       </div>
       <div className='border border-gray-300 mt-6 py-6 px-6
       rounded-3xl h-83 overflow-y-scroll no-scrollbar
