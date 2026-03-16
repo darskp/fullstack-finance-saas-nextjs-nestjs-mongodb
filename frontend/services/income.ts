@@ -10,4 +10,34 @@ const AddIncome = async (data: ITransactionData) => {
     }
 }
 
-export { AddIncome }
+const fetchIncome = async () => {
+    try {
+        const response = await api.get(`get-income`)
+        return response.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const updateIncome = async (data: ITransactionData) => {
+    const {_id,...otherUpdatedData}=data;
+    try {
+        const response = await api.put(`update-income/${String(data._id)}`,otherUpdatedData)
+        return response.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const deleteIncome = async (id:string) => {
+    try {
+        const response = await api.delete(`delete-income/${String(id)}`)
+        return response.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+export { AddIncome, fetchIncome,updateIncome,deleteIncome }

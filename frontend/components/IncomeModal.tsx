@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/Button";
 import {
     Dialog,
@@ -21,8 +21,14 @@ import { ChevronDownIcon } from "lucide-react";
 import { ITransactionData } from "@/utils/types";
 import { toast } from "sonner";
 
-const IncomeModal = ({ handleAddIncome }: {
-    handleAddIncome: (incomedata: ITransactionData) => void
+const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModal, handleUpdateIncome, incomeObj, isEditMode, setIsEditMode }: {
+    handleAddIncome: (incomedata: ITransactionData) => void,
+    handleUpdateIncome: (updateData: ITransactionData) => void,
+    showIncomeAddModal: boolean,
+    setShowIncomeAddModal: (value: boolean) => void,
+    incomeObj: ITransactionData | null,
+    isEditMode: boolean,
+    setIsEditMode: (value: boolean) => void
 }) => {
     const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
     const [selectedEmoji, setSelectedEmoji] = useState<string>("🚀");
@@ -32,33 +38,59 @@ const IncomeModal = ({ handleAddIncome }: {
     const [date, setDate] = useState<Date | null>(null)
     const [open, setOpen] = useState(false)
 
+    useEffect(() => {
+        if (isEditMode && incomeObj) {
+            setSelectedEmoji(incomeObj.emoji || "🚀");
+            setTitle(incomeObj.title || "");
+            setCategory(incomeObj.category || "");
+            setAmount(incomeObj.amount || "");
+            setDate(incomeObj.date ? new Date(incomeObj.date) : null);
+        } else {
+            setSelectedEmoji("🚀");
+            setTitle("");
+            setCategory("");
+            setAmount("");
+            setDate(null);
+        }
+    }, [incomeObj, isEditMode, showIncomeAddModal]);
+
     const handleEmojiclick = (emjobj: { emoji: string }) => {
         setSelectedEmoji(emjobj.emoji)
         setShowEmojiPicker(false)
     }
 
-    const handleAddIncomeBtn = () => {
+    const handleIncomeBtn = () => {
         const incomeData: ITransactionData = {
-            title, category, emoji: selectedEmoji, amount, date, transactionType: 'Income'
+            title, category, emoji: selectedEmoji, amount, date, transactionType: 'Income',
+            _id: isEditMode ? incomeObj?._id : undefined
         }
-        if(!title || !category || !amount || !date){
+        if (!title || !category || !amount || !date) {
             toast.error("Please fill all the fields")
             return
         }
-        console.log("inco",incomeData);
-        handleAddIncome(incomeData)
+        if (isEditMode) {
+            console.log("incomeData",incomeData);
+            
+            handleUpdateIncome(incomeData)
+        } else {
+            handleAddIncome(incomeData)
+        }
+    }
+
+    const handleShowIncomeAddModal = () => {
+        setShowIncomeAddModal(!showIncomeAddModal)
     }
 
     return (
-        <Dialog>
+        <Dialog open={showIncomeAddModal} onOpenChange={handleShowIncomeAddModal}>
             <DialogTrigger asChild>
-                <Button className="cursor-pointer">Open Dialog</Button>
+                <Button className="cursor-pointer" onClick={() => setIsEditMode(false)}>Add Income</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add Income</DialogTitle>
+                    <DialogTitle>{isEditMode?"Update Income" : "Add Income"}</DialogTitle>
                     <DialogDescription>
-                        Add income to the list in just a few simple steps
+                        {isEditMode ? "Update" : "Add"} income to the list in just a few simple steps
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-start justify-center gap-4">
@@ -146,8 +178,8 @@ const IncomeModal = ({ handleAddIncome }: {
                             Close
                         </Button>
                     </DialogClose>
-                    <Button className="cursor-pointer" onClick={handleAddIncomeBtn}>
-                        Add Income
+                    <Button className="cursor-pointer" onClick={handleIncomeBtn}>
+                        {isEditMode ? "Update Income" : " Add Income"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
