@@ -1,11 +1,14 @@
 "use client"
-import { ITransactionData } from '@/utils/types';
+import { ITransactionData, NewCategoriesDataType } from '@/utils/types';
 import IncomeModal from './IncomeModal';
 import { SquarePen, Trash2, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { AddIncome, deleteIncome, fetchIncome, updateIncome } from '@/services/income';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Spinner } from './ui/spinner';
+import * as Highcharts from 'highcharts';
+import { HighchartsReact } from 'highcharts-react-official';
+import { fetchTransactionsList, getChartOptions } from '@/utils/helpers';
 
 const Income = () => {
   const [loading, setLoading] = useState(false);
@@ -13,6 +16,8 @@ const Income = () => {
   const [showIncomeAddModal, setShowIncomeAddModal] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [incomeObj, setIncomeObj] = useState<ITransactionData | null>(null);
+  const [seriesData, setSeriesData] = useState<any>([]);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const handleAddIncome = async (income: ITransactionData) => {
     try {
@@ -57,6 +62,12 @@ const Income = () => {
       console.log(response)
       if (response) {
         setIncomeList(response)
+        const { 
+           newSeriesData,
+        newCategoriesData
+        } = fetchTransactionsList(response);
+        setCategories(newCategoriesData);
+        setSeriesData(newSeriesData)
       }
       setLoading(false)
     } catch (error) {
@@ -67,7 +78,7 @@ const Income = () => {
     }
   }
 
-  const handleDeleteIncome = async (id:string) => {
+  const handleDeleteIncome = async (id: string) => {
     try {
       const response = await deleteIncome(id)
       console.log(response)
@@ -81,8 +92,7 @@ const Income = () => {
     }
   }
 
-  const handleUpdateIcon = (income:ITransactionData) => {
-    console.log("myincom",income);
+  const handleUpdateIcon = (income: ITransactionData) => {
     setIsEditMode(true)
     setShowIncomeAddModal(true)
     setIncomeObj(income)
@@ -92,8 +102,10 @@ const Income = () => {
     handleGetIncome()
   }, [])
 
+  const options: Highcharts.Options = useMemo(() => getChartOptions(categories, seriesData), [categories, seriesData])
+
   return (
-    <div className='w-[75%] ml-8 mt-6 mr-8'>
+    <div className='flex-1 h-screen flex flex-col overflow-hidden px-8 py-6'>
       <div className='flex w-full justify-between'>
         <h1 className='text-xl font-medium'>Incomes</h1>
         <IncomeModal
@@ -106,13 +118,21 @@ const Income = () => {
           setIsEditMode={setIsEditMode}
         />
       </div>
-      {incomeList?.length ?
-        <div className='border border-gray-300 mt-6 py-6 px-6
-      rounded-3xl h-83 overflow-y-scroll no-scrollbar
-      '>
-          <div className='grid grid-cols-2 gap-10'>
-            {incomeList.map((income: ITransactionData, index: number) => {
-              return (
+      {incomeList?.length ? (
+        <>
+          <div className='border border-gray-300 mt-4 py-3 px-6 rounded-3xl'>
+            <div className='font-medium text-lg'>Income Overview</div>
+            <div className='text-sm text-gray-500'>
+              Monitor your income over time and gain insights into your earnings
+            </div>
+            <div className='mt-8'>
+              <HighchartsReact highcharts={Highcharts} options={options} />
+            </div>
+          </div>
+
+          <div className='border border-gray-300 mt-6 py-6 px-6 rounded-3xl flex-1 overflow-y-auto no-scrollbar'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-10'>
+              {incomeList.map((income: ITransactionData, index: number) => (
                 <div key={index} className='flex gap-2 justify-between items-center'>
                   <div className='flex gap-2'>
                     <span className='bg-gray-100 shadow-2xl text-2xl w-12 h-12 rounded-full flex items-center justify-center'>
@@ -132,19 +152,30 @@ const Income = () => {
                       <TrendingUp className='w-4 h-4 text-green-800 font-bold' />
                     </div>
                     <div className='flex items-center justify-center gap-2'>
-                      <SquarePen onClick={()=>handleUpdateIcon(income)} className='w-5 h-5 text-gray-500 cursor-pointer' />
-                      <Trash2 className='text-red-400 w-5 h-5 cursor-pointer' onClick={()=>handleDeleteIncome(income._id!)} />
+                      <SquarePen
+                        onClick={() => handleUpdateIcon(income)}
+                        className='w-5 h-5 text-gray-500 cursor-pointer'
+                      />
+                      <Trash2
+                        className='text-red-400 w-5 h-5 cursor-pointer'
+                        onClick={() => handleDeleteIncome(income._id!)}
+                      />
                     </div>
                   </div>
                 </div>
-              )
-            })}
+              ))}
+            </div>
           </div>
-        </div> : loading ? <div className='flex items-center justify-center h-full w-full'>
+        </>
+      ) : loading ? (
+        <div className='flex items-center justify-center h-full w-full'>
           <Spinner className='w-10 h-10' />
-        </div> : <div className='w-full h-full flex items-center justify-center font-medium'>
+        </div>
+      ) : (
+        <div className='w-full h-full flex items-center justify-center font-medium'>
           Click the &quot;Add Income&quot; button to add income
-        </div>}
+        </div>
+      )}
     </div>
   )
 }
