@@ -1,67 +1,64 @@
 "use client"
-import { ITransactionData, NewCategoriesDataType } from '@/utils/types';
+import { ITransactionData } from '@/utils/types';
 import TransactionModal from './TransactionModal';
-import { SquarePen, Trash2, TrendingUp } from 'lucide-react';
+import { SquarePen, Trash2, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { AddIncome, deleteIncome, fetchIncome, updateIncome } from '@/services/income';
+import { AddExpense, deleteExpense, fetchExpense, updateExpense } from '@/services/expenses';
 import { useEffect, useMemo, useState } from 'react';
 import { Spinner } from './ui/spinner';
 import * as Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
 import { fetchTransactionsList, getChartOptions } from '@/utils/helpers';
 
-const Income = () => {
+const Expense = () => {
   const [loading, setLoading] = useState(false);
-  const [incomeList, setIncomeList] = useState<ITransactionData[]>([]);
-  const [showIncomeAddModal, setShowIncomeAddModal] = useState<boolean>(false);
+  const [expenseList, setExpenseList] = useState<ITransactionData[]>([]);
+  const [showExpenseAddModal, setShowExpenseAddModal] = useState<boolean>(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [incomeObj, setIncomeObj] = useState<ITransactionData | null>(null);
+  const [expenseObj, setExpenseObj] = useState<ITransactionData | null>(null);
   const [seriesData, setSeriesData] = useState<any>([]);
   const [categories, setCategories] = useState<string[]>([]);
 
-  const handleAddIncome = async (income: ITransactionData) => {
+  const handleAddExpense = async (expense: ITransactionData) => {
     try {
-      const respose = await AddIncome(income)
-      console.log(respose)
-      if (respose) {
-        toast.success("Income added Successfully")
-        setShowIncomeAddModal(false)
-        setIncomeObj(null)
+      const response = await AddExpense(expense)
+      if (response) {
+        toast.success("Expense added Successfully")
+        setShowExpenseAddModal(false)
+        setExpenseObj(null)
         setIsEditMode(false)
-        await handleGetIncome()
+        await handleGetExpense()
       }
     }
     catch (error) {
-      toast.error("Error while adding income")
-      console.log("Error while adding income");
+      toast.error("Error while adding expense")
+      console.log("Error while adding expense");
     }
   }
 
-  const handleUpdateIncome = async (income: ITransactionData) => {
+  const handleUpdateExpense = async (expense: ITransactionData) => {
     try {
-      const respose = await updateIncome(income)
-      console.log(respose)
-      if (respose) {
-        toast.success("Income updated Successfully")
-        setShowIncomeAddModal(false)
-        setIncomeObj(null)
+      const response = await updateExpense(expense)
+      if (response) {
+        toast.success("Expense updated Successfully")
+        setShowExpenseAddModal(false)
+        setExpenseObj(null)
         setIsEditMode(false)
-        await handleGetIncome()
+        await handleGetExpense()
       }
     }
     catch (error) {
-      toast.error("Error while updating income")
-      console.log("Error while updating income");
+      toast.error("Error while updating expense")
+      console.log("Error while updating expense");
     }
   }
 
-  const handleGetIncome = async () => {
+  const handleGetExpense = async () => {
     try {
       setLoading(true)
-      const response = await fetchIncome()
-      console.log(response)
+      const response = await fetchExpense()
       if (response) {
-        setIncomeList(response)
+        setExpenseList(response)
         const { 
            newSeriesData,
         newCategoriesData
@@ -72,34 +69,32 @@ const Income = () => {
       setLoading(false)
     } catch (error) {
       setLoading(false)
-      toast.error("Error while getting income")
-      console.log("Error while getting income");
-
+      toast.error("Error while getting expense")
+      console.log("Error while getting expense");
     }
   }
 
-  const handleDeleteIncome = async (id: string) => {
+  const handleDeleteExpense = async (id: string) => {
     try {
-      const response = await deleteIncome(id)
-      console.log(response)
+      const response = await deleteExpense(id)
       if (response) {
-        toast.success("Income deleted Successfully")
-        await handleGetIncome()
+        toast.success("Expense deleted Successfully")
+        await handleGetExpense()
       }
     } catch (error) {
-      toast.error("Error while deleting income")
-      console.log("Error while deleting income");
+      toast.error("Error while deleting expense")
+      console.log("Error while deleting expense");
     }
   }
 
-  const handleUpdateIcon = (income: ITransactionData) => {
+  const handleUpdateIcon = (expense: ITransactionData) => {
     setIsEditMode(true)
-    setShowIncomeAddModal(true)
-    setIncomeObj(income)
+    setShowExpenseAddModal(true)
+    setExpenseObj(expense)
   }
 
   useEffect(() => {
-    handleGetIncome()
+    handleGetExpense()
   }, [])
 
   const options: Highcharts.Options = useMemo(() => getChartOptions(categories, seriesData), [categories, seriesData])
@@ -107,24 +102,24 @@ const Income = () => {
   return (
     <div className='flex-1 h-screen flex flex-col overflow-hidden px-8 py-6'>
       <div className='flex w-full justify-between'>
-        <h1 className='text-xl font-medium'>Incomes</h1>
+        <h1 className='text-xl font-medium'>Expenses</h1>
         <TransactionModal
-          type="Income"
-          handleAddTransaction={handleAddIncome}
-          handleUpdateTransaction={handleUpdateIncome}
-          showAddModal={showIncomeAddModal}
-          setShowAddModal={setShowIncomeAddModal}
-          transactionObj={incomeObj}
+          type="Expense"
+          handleAddTransaction={handleAddExpense}
+          handleUpdateTransaction={handleUpdateExpense}
+          showAddModal={showExpenseAddModal}
+          setShowAddModal={setShowExpenseAddModal}
+          transactionObj={expenseObj}
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
         />
       </div>
-      {incomeList?.length ? (
+      {expenseList?.length ? (
         <>
           <div className='border border-gray-300 mt-4 py-3 px-6 rounded-3xl'>
-            <div className='font-medium text-lg'>Income Overview</div>
+            <div className='font-medium text-lg'>Expense Overview</div>
             <div className='text-sm text-gray-500'>
-              Monitor your income over time and gain insights into your earnings
+              Monitor your expenses over time and gain insights into your spending
             </div>
             <div className='mt-8'>
               <HighchartsReact highcharts={Highcharts} options={options} />
@@ -133,33 +128,33 @@ const Income = () => {
 
           <div className='border border-gray-300 mt-6 py-6 px-6 rounded-3xl flex-1 overflow-y-auto no-scrollbar'>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-10'>
-              {incomeList.map((income: ITransactionData, index: number) => (
+              {expenseList.map((expense: ITransactionData, index: number) => (
                 <div key={index} className='flex gap-2 justify-between items-center'>
                   <div className='flex gap-2'>
                     <span className='bg-gray-100 shadow-2xl text-2xl w-12 h-12 rounded-full flex items-center justify-center'>
-                      {income.emoji}
+                      {expense.emoji}
                     </span>
                     <div className='flex flex-col'>
-                      <span className='font-medium'>{income.title}</span>
-                      <span className='text-gray-500'>{income.category}</span>
+                      <span className='font-medium'>{expense.title}</span>
+                      <span className='text-gray-500'>{expense.category}</span>
                       <span className='text-xs text-gray-400 font-medium'>
-                        {income.date ? new Date(income.date).toLocaleDateString() : ""}
+                        {expense.date ? new Date(expense.date).toLocaleDateString() : ""}
                       </span>
                     </div>
                   </div>
                   <div className='flex items-center justify-center gap-3'>
-                    <div className='flex items-center justify-center gap-2 h-fit bg-green-100 rounded-md px-4 py-1'>
-                      <span className='text-green-800 font-medium'>+ ${income.amount}</span>
-                      <TrendingUp className='w-4 h-4 text-green-800 font-bold' />
+                    <div className='flex items-center justify-center gap-2 h-fit bg-red-100 rounded-md px-4 py-1'>
+                      <span className='text-red-800 font-medium'>- ${expense.amount}</span>
+                      <TrendingDown className='w-4 h-4 text-red-800 font-bold' />
                     </div>
                     <div className='flex items-center justify-center gap-2'>
                       <SquarePen
-                        onClick={() => handleUpdateIcon(income)}
+                        onClick={() => handleUpdateIcon(expense)}
                         className='w-5 h-5 text-gray-500 cursor-pointer'
                       />
                       <Trash2
                         className='text-red-400 w-5 h-5 cursor-pointer'
-                        onClick={() => handleDeleteIncome(income._id!)}
+                        onClick={() => handleDeleteExpense(expense._id!)}
                       />
                     </div>
                   </div>
@@ -174,11 +169,11 @@ const Income = () => {
         </div>
       ) : (
         <div className='w-full h-full flex items-center justify-center font-medium'>
-          Click the &quot;Add Income&quot; button to add income
+          Click the &quot;Add Expense&quot; button to add expense
         </div>
       )}
     </div>
   )
 }
 
-export default Income;
+export default Expense;

@@ -54,3 +54,41 @@ export const INCOME_CATEGORY_CONSTANTS: {
     title: "Other Income",
   },
 ];
+
+export const EXPENSE_CATEGORY_CONSTANTS: {
+    value: string;
+    title: string;
+}[] = [
+  {
+    value: "food",
+    title: "Food",
+  },
+  {
+    value: "rent",
+    title: "Rent",
+  },
+  {
+    value: "utilities",
+    title: "Utilities",
+  },
+  {
+    value: "entertainment",
+    title: "Entertainment",
+  },
+  {
+    value: "transportation",
+    title: "Transportation",
+  },
+  {
+    value: "shopping",
+    title: "Shopping",
+  },
+  {
+    value: "healthcare",
+    title: "Healthcare",
+  },
+  {
+    value: "otherExpense",
+    title: "Other Expense",
+  },
+];

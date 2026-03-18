@@ -76,7 +76,7 @@ const getChartOptions = (
                 const point = this.point;
                 const { type, icon, tCategory } = point;
                 const dataLabel = categories[this.x];
-                const textClass = "text-green-500";
+               const textClass = type === "Income" ? "text-green-500" : "text-red-500";
 
                 return `<div class="p-2 border shadow rounded-md flex flex-col items-center justify-start">
             <div class="flex w-full justify-between">
@@ -92,7 +92,9 @@ const getChartOptions = (
             <div class="flex items-center justify-between w-full">
               <div class="flex justify-between items-center">
                 <span class="text-sm">${icon}</span>
-                <span class="text-sm">Income</span>
+               <span class="text-sm">${
+                  type === "Income" ? "Income:" : "Expense:"
+                }</span>
               </div>
               <span class="font-medium ${textClass} text-sm">$${this.y}</span>
           </div>          

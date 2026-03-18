@@ -30,9 +30,8 @@ console.log("pathname",pathname);
                 <div className='ml-2 mt-4 flex flex-col gap-3'>
                     {SIDEBAR_CONSTANTS.map((item) => {
                         const { icon: Icon, title, id } = item;
-                        console.log(id,pathname,id===pathname);
-                        
-                        const selectedItemClass = (id === pathname) ? `bg-woodsmoke border-shark` : " ";
+
+                        const selectedItemClass = (id === pathname) ? `bg-woodsmoke2 border-shark` : " ";
                         return (
                             <div key={id}
                                 className={cn(`flex gap-2 cursor-pointer py-2 px-3 rounded-md w-[95%] border border-transparent`, selectedItemClass)}

@@ -14,83 +14,92 @@ import {
 import EmojiPicker from "emoji-picker-react";
 import { Input } from "./ui/Input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/Select";
-import { INCOME_CATEGORY_CONSTANTS } from "@/utils/constants";
+import { INCOME_CATEGORY_CONSTANTS, EXPENSE_CATEGORY_CONSTANTS } from "@/utils/constants";
 import { Calendar } from "./ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 import { ITransactionData } from "@/utils/types";
 import { toast } from "sonner";
 
-const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModal, handleUpdateIncome, incomeObj, isEditMode, setIsEditMode }: {
-    handleAddIncome: (incomedata: ITransactionData) => void,
-    handleUpdateIncome: (updateData: ITransactionData) => void,
-    showIncomeAddModal: boolean,
-    setShowIncomeAddModal: (value: boolean) => void,
-    incomeObj: ITransactionData | null,
-    isEditMode: boolean,
-    setIsEditMode: (value: boolean) => void
-}) => {
+interface TransactionModalProps {
+    type: 'Income' | 'Expense';
+    handleAddTransaction: (data: ITransactionData) => void;
+    handleUpdateTransaction: (data: ITransactionData) => void;
+    showAddModal: boolean;
+    setShowAddModal: (value: boolean) => void;
+    transactionObj: ITransactionData | null;
+    isEditMode: boolean;
+    setIsEditMode: (value: boolean) => void;
+}
+
+const TransactionModal = ({
+    type,
+    handleAddTransaction,
+    handleUpdateTransaction,
+    showAddModal,
+    setShowAddModal,
+    transactionObj,
+    isEditMode,
+    setIsEditMode
+}: TransactionModalProps) => {
     const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
-    const [selectedEmoji, setSelectedEmoji] = useState<string>("🚀");
+    const defaultEmoji = type === 'Income' ? "🚀" : "💸";
+    const [selectedEmoji, setSelectedEmoji] = useState<string>(defaultEmoji);
     const [title, setTitle] = useState("")
     const [category, setCategory] = useState("")
     const [amount, setAmount] = useState("")
     const [date, setDate] = useState<Date | null>(null)
     const [open, setOpen] = useState(false)
 
+    const constants = type === 'Income' ? INCOME_CATEGORY_CONSTANTS : EXPENSE_CATEGORY_CONSTANTS;
+
     useEffect(() => {
-        if (isEditMode && incomeObj) {
-            setSelectedEmoji(incomeObj.emoji || "🚀");
-            setTitle(incomeObj.title || "");
-            setCategory(incomeObj.category || "");
-            setAmount(incomeObj.amount || "");
-            setDate(incomeObj.date ? new Date(incomeObj.date) : null);
+        if (isEditMode && transactionObj) {
+            setSelectedEmoji(transactionObj.emoji || defaultEmoji);
+            setTitle(transactionObj.title || "");
+            setCategory(transactionObj.category || "");
+            setAmount(transactionObj.amount || "");
+            setDate(transactionObj.date ? new Date(transactionObj.date) : null);
         } else {
-            setSelectedEmoji("🚀");
+            setSelectedEmoji(defaultEmoji);
             setTitle("");
             setCategory("");
             setAmount("");
             setDate(null);
         }
-    }, [incomeObj, isEditMode, showIncomeAddModal]);
+    }, [transactionObj, isEditMode, showAddModal, type, defaultEmoji]);
 
     const handleEmojiclick = (emjobj: { emoji: string }) => {
         setSelectedEmoji(emjobj.emoji)
         setShowEmojiPicker(false)
     }
 
-    const handleIncomeBtn = () => {
-        const incomeData: ITransactionData = {
-            title, category, emoji: selectedEmoji, amount, date, transactionType: 'Income',
-            _id: isEditMode ? incomeObj?._id : undefined
+    const handleSubmit = () => {
+        const transactionData: ITransactionData = {
+            title, category, emoji: selectedEmoji, amount, date, transactionType: type,
+            _id: isEditMode ? transactionObj?._id : undefined
         }
         if (!title || !category || !amount || !date) {
             toast.error("Please fill all the fields")
             return
         }
         if (isEditMode) {
-            console.log("incomeData",incomeData);
-            
-            handleUpdateIncome(incomeData)
+            handleUpdateTransaction(transactionData)
         } else {
-            handleAddIncome(incomeData)
+            handleAddTransaction(transactionData)
         }
     }
 
-    const handleShowIncomeAddModal = () => {
-        setShowIncomeAddModal(!showIncomeAddModal)
-    }
-
     return (
-        <Dialog open={showIncomeAddModal} onOpenChange={handleShowIncomeAddModal}>
+        <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
             <DialogTrigger asChild>
-                <Button className="cursor-pointer" onClick={() => setIsEditMode(false)}>Add Income</Button>
+                <Button className="cursor-pointer" onClick={() => setIsEditMode(false)}>Add {type}</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{isEditMode?"Update Income" : "Add Income"}</DialogTitle>
+                    <DialogTitle>{isEditMode ? `Update ${type}` : `Add ${type}`}</DialogTitle>
                     <DialogDescription>
-                        {isEditMode ? "Update" : "Add"} income to the list in just a few simple steps
+                        {isEditMode ? "Update" : "Add"} {type.toLowerCase()} to the list in just a few simple steps
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-start justify-center gap-4">
@@ -100,7 +109,7 @@ const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModa
                         >
                             {selectedEmoji}
                         </span>
-                        {showEmojiPicker ? <div className="absolute top-0 left-15">
+                        {showEmojiPicker ? <div className="absolute top-0 left-15 z-50">
                             <EmojiPicker onEmojiClick={handleEmojiclick} />
                         </div> : null}
                     </div>
@@ -109,7 +118,7 @@ const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModa
                         <span className="font-medium">Title</span>
                         <Input
                             className="mt-2"
-                            placeholder="Enter income title"
+                            placeholder={`Enter ${type.toLowerCase()} title`}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
@@ -124,7 +133,7 @@ const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModa
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Category</SelectLabel>
-                                    {INCOME_CATEGORY_CONSTANTS.map(({ value, title }, index, array) => {
+                                    {constants.map(({ value, title }, index) => {
                                         return (
                                             <SelectItem key={index} id={String(index)} className="cursor-pointer" value={value}>{title}</SelectItem>
                                         )
@@ -170,7 +179,6 @@ const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModa
                             </PopoverContent>
                         </Popover>
                     </div>
-
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
@@ -178,8 +186,8 @@ const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModa
                             Close
                         </Button>
                     </DialogClose>
-                    <Button className="cursor-pointer" onClick={handleIncomeBtn}>
-                        {isEditMode ? "Update Income" : " Add Income"}
+                    <Button className="cursor-pointer" onClick={handleSubmit}>
+                        {isEditMode ? `Update ${type}` : `Add ${type}`}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -187,4 +195,4 @@ const IncomeModal = ({ handleAddIncome, showIncomeAddModal, setShowIncomeAddModa
     );
 };
 
-export default IncomeModal;
+export default TransactionModal;

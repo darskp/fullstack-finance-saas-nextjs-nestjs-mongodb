@@ -1,5 +1,7 @@
-import React from 'react'
+import Expense from '@/components/Expense';
 
-const Expense = () => null
+const UserExpense = async() => {
+    return(<Expense/>)
+};
 
-export default Expense
+export default UserExpense;
