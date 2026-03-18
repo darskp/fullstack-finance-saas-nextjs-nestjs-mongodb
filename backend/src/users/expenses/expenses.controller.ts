@@ -11,13 +11,13 @@ import { UpdateExpensesDto } from './dto/update-expenses.dto';
 export class ExpensesController {
     constructor(private readonly expensesService: ExpensesService) { }
 
-    @Get('get-expenses')
+    @Get('get-expense')
     async getUserExpenses(@CurrentUser() user: { id: string }): Promise<Expense[]> {
         return this.expensesService.findUserExpenses(user.id);
     }
 
 
-    @Post('add-expenses')
+    @Post('add-expense')
     @HttpCode(HttpStatus.CREATED)
     async addExpenses(
         @CurrentUser() user: { id: string },
@@ -26,7 +26,7 @@ export class ExpensesController {
         return this.expensesService.addExpenses(user.id, addExpensesDto);
     }
 
-    @Put('update-expenses/:id')
+    @Put('update-expense/:id')
     @HttpCode(HttpStatus.OK)
     async updateExpenses(
         @Param('id') id: string,
@@ -36,7 +36,7 @@ export class ExpensesController {
         return this.expensesService.updateExpenses(id, user.id, updateExpensesDto);
     }
 
-    @Delete('delete-expenses/:id')
+    @Delete('delete-expense/:id')
     @HttpCode(HttpStatus.OK)
     async deleteExpenses(
         @Param('id') id: string,
