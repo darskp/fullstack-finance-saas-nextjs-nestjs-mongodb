@@ -22,6 +22,7 @@ const fetchTransactionsList = (list: ITransactionData[]) => {
             icon,
             tCategory: category,
             rawDate: x,
+            color: type?.toLowerCase() === "income" ? "#22c55e" : "#ffe2e2",
         };
     })
 
@@ -41,7 +42,8 @@ const fetchTransactionsList = (list: ITransactionData[]) => {
 const getChartOptions = (
     categories: any,
     seriesData: NewCategoriesDataType[],
-    chartType: ChartTypes = "column"
+    chartType: ChartTypes = "column",
+    color?: string,
 ): Highcharts.Options => {
     return {
         title: {
@@ -111,10 +113,39 @@ const getChartOptions = (
             {
                 type: chartType,
                 data: seriesData,
-                color: "#8271fe",
+                ...(color ? { color : color } : {}),
             },
-        ],
+        ] as any,
     };
 }
 
-export { getChartOptions, fetchTransactionsList }
+
+const tableColumns:{}[] =[
+    {
+        name:'Icon',
+        id:1
+    },{
+        name:'Title',
+        id:2
+    },{
+        name:'Type',
+        id:3
+    },{
+        name:'Category',
+        id:4
+    },{
+        name:'Date',
+        id:5
+    },{
+        name:'Amount',
+        id:6
+    },{
+        name:'Edit',
+        id:7
+    },{
+        name:'Delete',
+        id:8
+    }
+]
+
+export { getChartOptions, fetchTransactionsList,tableColumns }

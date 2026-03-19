@@ -102,7 +102,7 @@ const Income = () => {
     handleGetIncome()
   }, [])
 
-  const options: Highcharts.Options = useMemo(() => getChartOptions(categories, seriesData), [categories, seriesData])
+  const options: Highcharts.Options = useMemo(() => getChartOptions(categories, seriesData, 'column', "#22c55e"), [categories, seriesData])
 
   return (
     <div className='flex-1 h-screen flex flex-col overflow-hidden px-8 py-6'>

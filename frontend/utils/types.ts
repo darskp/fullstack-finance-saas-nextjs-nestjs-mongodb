@@ -22,7 +22,8 @@ export type ChartPoint = {
     type: string;
     icon: string;
     tCategory: string;
-    rawData?: Date;
+    rawDate?: Date;
+    color?: string;
 }
 
 export type ChartTypes = "line" | "column" | "bar";

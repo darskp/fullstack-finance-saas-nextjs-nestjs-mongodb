@@ -22,7 +22,7 @@ import { ITransactionData } from "@/utils/types";
 import { toast } from "sonner";
 
 interface TransactionModalProps {
-    type: 'Income' | 'Expense';
+    type: 'Income' | 'Expense' | 'Transaction';
     handleAddTransaction: (data: ITransactionData) => void;
     handleUpdateTransaction: (data: ITransactionData) => void;
     showAddModal: boolean;
@@ -43,15 +43,17 @@ const TransactionModal = ({
     setIsEditMode
 }: TransactionModalProps) => {
     const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
-    const defaultEmoji = type === 'Income' ? "🚀" : "💸";
+    const [subType, setSubType] = useState<'Income' | 'Expense' | "">(type === 'Transaction' ? "" : type as 'Income' | 'Expense');
+
+    const constants = subType === 'Income' ? INCOME_CATEGORY_CONSTANTS : subType === 'Expense' ? EXPENSE_CATEGORY_CONSTANTS : [];
+    const defaultEmoji = subType === 'Income' ? "🚀" : subType === 'Expense' ? "💸" : "🔄";
+
     const [selectedEmoji, setSelectedEmoji] = useState<string>(defaultEmoji);
     const [title, setTitle] = useState("")
     const [category, setCategory] = useState("")
     const [amount, setAmount] = useState("")
     const [date, setDate] = useState<Date | null>(null)
     const [open, setOpen] = useState(false)
-
-    const constants = type === 'Income' ? INCOME_CATEGORY_CONSTANTS : EXPENSE_CATEGORY_CONSTANTS;
 
     useEffect(() => {
         if (isEditMode && transactionObj) {
@@ -60,14 +62,21 @@ const TransactionModal = ({
             setCategory(transactionObj.category || "");
             setAmount(transactionObj.amount || "");
             setDate(transactionObj.date ? new Date(transactionObj.date) : null);
+            if (type === 'Transaction') {
+                setSubType((transactionObj.transactionType as 'Income' | 'Expense') || "");
+            }
         } else {
-            setSelectedEmoji(defaultEmoji);
+            const initialDefaultEmoji = type === 'Income' ? "🚀" : type === 'Expense' ? "💸" : "🔄";
+            setSelectedEmoji(initialDefaultEmoji);
             setTitle("");
             setCategory("");
             setAmount("");
             setDate(null);
+            if (type === 'Transaction') {
+                setSubType("");
+            }
         }
-    }, [transactionObj, isEditMode, showAddModal, type, defaultEmoji]);
+    }, [transactionObj, isEditMode, showAddModal, type]);
 
     const handleEmojiclick = (emjobj: { emoji: string }) => {
         setSelectedEmoji(emjobj.emoji)
@@ -76,7 +85,8 @@ const TransactionModal = ({
 
     const handleSubmit = () => {
         const transactionData: ITransactionData = {
-            title, category, emoji: selectedEmoji, amount, date, transactionType: type,
+            title, category, emoji: selectedEmoji, amount, date, 
+            transactionType: type === 'Transaction' ? subType : type,
             _id: isEditMode ? transactionObj?._id : undefined
         }
         if (!title || !category || !amount || !date) {
@@ -113,6 +123,24 @@ const TransactionModal = ({
                             <EmojiPicker onEmojiClick={handleEmojiclick} />
                         </div> : null}
                     </div>
+
+                    {type === 'Transaction' && (
+                        <div className="w-full">
+                            <span className="font-medium">Transaction Type</span>
+                            <Select disabled={isEditMode} value={subType} onValueChange={(value) => { 
+                                setSubType(value as 'Income' | 'Expense');
+                                setCategory(""); // Reset category when switching type
+                            }}>
+                                <SelectTrigger className="mt-2 w-full cursor-pointer">
+                                    <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem className="cursor-pointer" value="Income">Income</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="Expense">Expense</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     <div className="w-full">
                         <span className="font-medium">Title</span>
