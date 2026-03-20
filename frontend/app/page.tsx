@@ -1,7 +1,7 @@
-import Image from "next/image";
+import Dashboard from "@/components/Dashboard";
 
-export default function Home() {
+export default function App() {
   return (
-    <div><h2 className="text-black">App</h2></div>
+   <Dashboard/>
   );
 }

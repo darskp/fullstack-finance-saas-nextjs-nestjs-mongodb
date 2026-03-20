@@ -92,3 +92,11 @@ export const EXPENSE_CATEGORY_CONSTANTS: {
     title: "Other Expense",
   },
 ];
+
+export const USER_IMAGE = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png";
+export const TOTAL_BALANCE_IMAGE =
+  "https://cdn-icons-png.flaticon.com/128/2169/2169864.png";
+export const INCOME_IMAGE = "https://cdn-icons-png.flaticon.com/128/3176/3176837.png";
+export const EXPENSE_IMAGE = "https://cdn-icons-png.flaticon.com/128/3176/3176833.png";
+export const TOTAL_TRANSACTION_IMAGE =
+  "https://cdn-icons-png.flaticon.com/128/10691/10691348.png";

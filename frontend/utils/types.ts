@@ -27,3 +27,9 @@ export type ChartPoint = {
 }
 
 export type ChartTypes = "line" | "column" | "bar";
+
+export type CardProps = {
+  title: string;
+  imgSrc: string;
+  value: number;
+};
