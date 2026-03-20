@@ -1,13 +1,16 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import api from "@/services/apiClient";
 
 const AxiosInterceptor = ({ children }: { children: React.ReactNode }) => {
-  const { getToken } = useAuth();
+  const { getToken, isLoaded } = useAuth();
+  const [interceptorReady, setInterceptorReady] = useState(false);
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     const requestInterceptor = api.interceptors.request.use(
       async (config) => {
         const token = await getToken();
@@ -21,10 +24,16 @@ const AxiosInterceptor = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
+    setInterceptorReady(true);
+
     return () => {
       api.interceptors.request.eject(requestInterceptor);
     };
-  }, [getToken]);
+  }, [getToken, isLoaded]);
+
+  if (!isLoaded || !interceptorReady) {
+    return null;
+  }
 
   return <>{children}</>;
 };

@@ -97,7 +97,7 @@ const Expense = () => {
     handleGetExpense()
   }, [])
 
-  const options: Highcharts.Options = useMemo(() => getChartOptions(categories, seriesData, 'column', "#ffe2e2"), [categories, seriesData])
+  const options: Highcharts.Options = useMemo(() => getChartOptions(categories, seriesData, 'column', "#EF5350"), [categories, seriesData])
 
   return (
     <div className='flex-1 h-screen flex flex-col overflow-hidden px-8 py-6'>

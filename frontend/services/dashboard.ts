@@ -15,12 +15,12 @@ export async function getDashboardValues(): Promise<DashboardValues> {
         fetchExpense(),
     ]);
 
-    const incomeValue = incomeList.reduce(
+    const incomeValue = incomeList?.reduce(
         (sum:number, item:ITransactionData) => sum + Number(item.amount),
         0
     );
 
-    const expenseValue = expenseList.reduce(
+    const expenseValue = expenseList?.reduce(
         (sum:number, item:ITransactionData) => sum + Number(item.amount),
         0
     );
