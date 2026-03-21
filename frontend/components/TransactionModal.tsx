@@ -12,7 +12,6 @@ import {
     DialogTrigger,
 } from "./ui/Modal";
 import EmojiPicker from "emoji-picker-react";
-import { Input } from "./ui/Input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/Select";
 import { INCOME_CATEGORY_CONSTANTS, EXPENSE_CATEGORY_CONSTANTS } from "@/utils/constants";
 import { Calendar } from "./ui/Calendar";
@@ -20,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 import { ITransactionData } from "@/utils/types";
 import { toast } from "sonner";
+import { Input } from "./ui/input";
 
 interface TransactionModalProps {
     type: 'Income' | 'Expense' | 'Transaction';
