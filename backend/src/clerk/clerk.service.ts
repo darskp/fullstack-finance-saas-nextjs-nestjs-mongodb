@@ -20,19 +20,24 @@ export class ClerkService {
     headers: Record<string, string>
   ): Promise<WebhookEvent> {
     
-    const secret = this.configService.get<string>('CLEARK_WEBHOOK_SIGNING_SECRET', '');
+    const rawSecret = this.configService.get<string>('CLERK_WEBHOOK_SIGNING_SECRET', '');
+    const secret = rawSecret.trim();
 
     if (!secret) {
-      console.error("CLEARK_WEBHOOK_SIGNING_SECRET is not defined in environment variables");
+      console.error("DEBUG: CLERK_WEBHOOK_SIGNING_SECRET is missing from environment variables!");
       throw new BadRequestException("Webhook secret configuration missing");
     }
+
+    // Safely log the first few characters to verify the secret matches Clerk dashboard
+    console.log(`DEBUG: Using secret starting with: ${secret.substring(0, 10)}...`);
 
     const wh = new Webhook(secret);
 
     try {
       return wh.verify(body, headers) as WebhookEvent;
     } catch (err) {
-      console.error("Webhook verification failed:", err.message);
+      console.error("DEBUG: Webhook verification failed:", err.message);
+      console.error("DEBUG: Payload length:", typeof body === 'string' ? body.length : body.byteLength);
       throw new BadRequestException(`Invalid webhook signature: ${err.message}`);
     }
   }
