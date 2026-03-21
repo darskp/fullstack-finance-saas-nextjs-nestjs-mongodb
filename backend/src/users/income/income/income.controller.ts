@@ -17,7 +17,7 @@ import { UpdateIncomeDto } from './dto/update-income.dto';
 import { CurrentUser } from 'src/clerk/current-user.decorator';
 import { ClerkAuthGuard } from 'src/clerk/clerk-auth.guard';
 
-@Controller()
+@Controller('api/')
 @UseGuards(ClerkAuthGuard)
 export class IncomeController {
     constructor(private readonly incomeService: IncomeService) { }

@@ -2,9 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import mongoose from 'mongoose';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
   app.useGlobalPipes(
     //means the pipe will apply to all controllers and routes globally.
     new ValidationPipe(
@@ -17,9 +20,7 @@ async function bootstrap() {
     )
   )
 
-  app.setGlobalPrefix('api');
-
-  const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3001';
+  const allowedOrigin = configService.get<string>('ALLOWED_ORIGIN')
 
   app.enableCors({
     origin: allowedOrigin,
@@ -27,9 +28,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = process.env.PORT || 3000;
+  const port = configService.get<number>('PORT')!
   await app.listen(port);
-  console.log(`Backend is running on: http://localhost:${port}/api`);
+  console.log(`Backend is running on: http://localhost:${port}`);
 
 
   mongoose.connection.once('open', () => {

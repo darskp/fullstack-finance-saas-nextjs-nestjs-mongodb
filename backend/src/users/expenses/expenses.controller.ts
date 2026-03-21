@@ -6,7 +6,7 @@ import { Expense } from '../schemas/expense.schema';
 import { AddExpensesDto } from './dto/add-expenses.dto';
 import { UpdateExpensesDto } from './dto/update-expenses.dto';
 
-@Controller('')
+@Controller('api/')
 @UseGuards(ClerkAuthGuard)
 export class ExpensesController {
     constructor(private readonly expensesService: ExpensesService) { }

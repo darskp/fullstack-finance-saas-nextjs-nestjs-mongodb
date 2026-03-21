@@ -5,11 +5,13 @@ import { Webhook } from "svix";
 import { WebhookEvent } from "./interfaces/webhook-event.interface";
 import { ClerkUserCreatedDto } from "./dto/webhook-payload.dto";
 import { User } from "../users/schemas/user.schema";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class ClerkService {
 
   constructor(
+      private configService: ConfigService,
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) { }
 
@@ -17,9 +19,11 @@ export class ClerkService {
     body: string | Buffer,
     headers: Record<string, string>
   ): Promise<WebhookEvent> {
+    
+    const CLEARK_WEBHOOK_SIGNING_SECRET = this.configService.get<string>('CLEARK_WEBHOOK_SIGNING_SECRET', '');
 
-    const secret = process.env.CLERK_WEBHOOK_SECRET!;
-   const wh = new Webhook(secret);
+    const secret = CLEARK_WEBHOOK_SIGNING_SECRET;
+    const wh = new Webhook(secret);
 
     try {
       return wh.verify(body, headers) as WebhookEvent;
@@ -30,50 +34,62 @@ export class ClerkService {
 
   async handleEvent(event: WebhookEvent): Promise<{ message: string }> {
 
-    console.log("Webhook verified");
-    console.log("Event:", event.type);
-
     if (event.type === "user.created") {
 
       const data = event.data as ClerkUserCreatedDto;
 
       const email = data.email_addresses?.[0]?.email_address || null;
-      const fullName = [data.first_name, data.last_name]
+      let fullName = [data.first_name, data.last_name]
         .filter(Boolean)
         .join(" ");
+
+      if (!fullName && data.username) {
+        fullName = data.username;
+      }
+
+      if (!fullName) {
+        fullName = "Unknown User";
+      }
+
       const imageUrl = data.image_url || null;
 
-      const existingByClerkId = await this.userModel.findOne({ clerkId: data.id });
-      if (existingByClerkId) {
-        console.log(`User with clerkId ${data.id} already exists`);
-        return { message: "User email already exists" };
-      }
-
-      if (email) {
-        const existingByEmail = await this.userModel.findOne({ email });
-        if (existingByEmail) {
-          console.log(`User with email ${email} already exists`);
-          return { message: "User email already exists" };
+      try {
+        const existingByClerkId = await this.userModel.findOne({ clerkId: data.id });
+        if (existingByClerkId) {
+          console.log(`User with clerkId ${data.id} already exists`);
+          return { message: "User already exists with this Clerk ID" };
         }
+
+        if (email) {
+          const existingByEmail = await this.userModel.findOne({ email });
+          if (existingByEmail) {
+            console.log(`User with email ${email} already exists`);
+            return { message: "User already exists with this email" };
+          }
+        }
+
+        const newUser = new this.userModel({
+          clerkId: data.id,
+          fullName,
+          email,      // null if not provided
+          imageUrl,   // null if not provided
+        });
+
+        await newUser.save();
+
+        console.log("New user created successfully:", {
+          clerkId: data.id,
+          fullName,
+          email,
+          imageUrl,
+          username: data.username,
+        });
+
+        return { message: "User created successfully" };
+      } catch (error) {
+        console.error("Error creating user in handleEvent:", error);
+        throw new BadRequestException(`Failed to create user: ${error.message}`);
       }
-
-      const newUser = new this.userModel({
-        clerkId: data.id,
-        fullName: fullName || "Unknown User",
-        email,      // null if not provided
-        imageUrl,   // null if not provided
-      });
-
-      await newUser.save();
-
-      console.log("New user created:", {
-        clerkId: data.id,
-        fullName,
-        email,
-        imageUrl,
-      });
-
-      return { message: "User created successfully" };
     }
 
     return { message: `Event ${event.type} received` };

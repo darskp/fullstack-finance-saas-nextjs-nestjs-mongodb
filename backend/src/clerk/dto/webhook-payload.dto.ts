@@ -26,4 +26,8 @@ export class ClerkUserCreatedDto {
   @IsString()
   image_url?: string;
 
+  @IsOptional()
+  @IsString()
+  username?: string;
+
 }

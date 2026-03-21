@@ -5,10 +5,26 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ClerkModule } from './clerk/clerk.module';
 import { IncomeModule } from './users/income/income/income.module';
 import { ExpensesModule } from './users/expenses/expenses.module';
-
+import { TransactionModule } from './users/transaction/transaction.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [MongooseModule.forRoot(process.env.MONGODB_URI!), ClerkModule, IncomeModule, ExpensesModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    ClerkModule,
+    IncomeModule,
+    ExpensesModule,
+    TransactionModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

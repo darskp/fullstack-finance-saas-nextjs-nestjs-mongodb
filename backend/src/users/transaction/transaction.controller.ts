@@ -5,7 +5,7 @@ import { Expense } from '../schemas/expense.schema';
 import { Income } from '../schemas/income.schema';
 import { ClerkAuthGuard } from 'src/clerk/clerk-auth.guard';
 
-@Controller('')
+@Controller('api/')
 @UseGuards(ClerkAuthGuard)
 export class TransactionController {
 
