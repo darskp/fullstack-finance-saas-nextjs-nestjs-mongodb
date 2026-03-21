@@ -27,11 +27,7 @@ export class ClerkController {
         const payload = req.rawBody.toString();
         console.log("Received Webhook Payload:", payload);
 
-        const event = await this.clerkService.verifyWebhook(payload, {
-            "svix-id": svixId,
-            "svix-timestamp": svixTimestamp,
-            "svix-signature": svixSignature,
-        });
+        const event = await this.clerkService.verifyWebhook(req.rawBody, req.headers as Record<string, string>);
 
         const result = await this.clerkService.handleEvent(event as WebhookEvent);
 

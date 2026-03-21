@@ -24,12 +24,16 @@ export class ClerkService {
     const secret = rawSecret.trim();
 
     if (!secret) {
-      console.error("DEBUG: CLERK_WEBHOOK_SIGNING_SECRET is missing from environment variables!");
+      console.error("DEBUG: CLERK_WEBHOOK_SIGNING_SECRET is MISSING in environment variables!");
       throw new BadRequestException("Webhook secret configuration missing");
     }
 
-    // Safely log the first few characters to verify the secret matches Clerk dashboard
-    console.log(`DEBUG: Using secret starting with: ${secret.substring(0, 10)}...`);
+    // Safely log first and last few chars to verify matching Clerk dashboard
+    const displaySecret = `${secret.substring(0, 10)}...${secret.substring(secret.length - 4)}`;
+    console.log(`DEBUG: Loaded Secret: ${displaySecret}`);
+
+    console.log(`DEBUG: Received Svix-Signature: ${headers['svix-signature']?.substring(0, 15)}...`);
+    console.log(`DEBUG: Received Svix-Id: ${headers['svix-id']}`);
 
     const wh = new Webhook(secret);
 
@@ -37,7 +41,7 @@ export class ClerkService {
       return wh.verify(body, headers) as WebhookEvent;
     } catch (err) {
       console.error("DEBUG: Webhook verification failed:", err.message);
-      console.error("DEBUG: Payload length:", typeof body === 'string' ? body.length : body.byteLength);
+      console.error("DEBUG: Target Body Length:", typeof body === 'string' ? body.length : body.byteLength);
       throw new BadRequestException(`Invalid webhook signature: ${err.message}`);
     }
   }
