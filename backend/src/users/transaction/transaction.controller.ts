@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
-import { CurrentUser } from 'src/clerk/current-user.decorator';
+import { CurrentUser } from '../../clerk/current-user.decorator';
 import { Expense } from '../schemas/expense.schema';
 import { Income } from '../schemas/income.schema';
-import { ClerkAuthGuard } from 'src/clerk/clerk-auth.guard';
+import { ClerkAuthGuard } from '../../clerk/clerk-auth.guard';
 
 @Controller('api/')
 @UseGuards(ClerkAuthGuard)

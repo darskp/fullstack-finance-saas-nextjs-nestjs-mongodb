@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { ClerkAuthGuard } from 'src/clerk/clerk-auth.guard';
+import { ClerkAuthGuard } from '../../clerk/clerk-auth.guard';
 import { ExpensesService } from './expenses.service';
-import { CurrentUser } from 'src/clerk/current-user.decorator';
+import { CurrentUser } from '../../clerk/current-user.decorator';
 import { Expense } from '../schemas/expense.schema';
 import { AddExpensesDto } from './dto/add-expenses.dto';
 import { UpdateExpensesDto } from './dto/update-expenses.dto';

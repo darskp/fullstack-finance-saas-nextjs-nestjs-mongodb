@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Income } from 'src/users/schemas/income.schema';
-import { User } from 'src/users/schemas/user.schema';
+import { Income } from '../../schemas/income.schema';
+import { User } from '../../schemas/user.schema';
 import { AddIncomeDto } from './dto/add-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 

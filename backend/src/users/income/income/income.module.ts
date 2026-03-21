@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { IncomeController } from './income.controller';
 import { IncomeService } from './income.service';
-import { Income, IncomeSchema } from 'src/users/schemas/income.schema';
-import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { Income, IncomeSchema } from '../../schemas/income.schema';
+import { User, UserSchema } from '../../schemas/user.schema';
 
 @Module({
   imports: [

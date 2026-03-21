@@ -11,11 +11,11 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { IncomeService } from './income.service';
-import { Income } from 'src/users/schemas/income.schema';
+import { Income } from '../../schemas/income.schema';
 import { AddIncomeDto } from './dto/add-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
-import { CurrentUser } from 'src/clerk/current-user.decorator';
-import { ClerkAuthGuard } from 'src/clerk/clerk-auth.guard';
+import { CurrentUser } from '../../../clerk/current-user.decorator';
+import { ClerkAuthGuard } from '../../../clerk/clerk-auth.guard';
 
 @Controller('api/')
 @UseGuards(ClerkAuthGuard)
