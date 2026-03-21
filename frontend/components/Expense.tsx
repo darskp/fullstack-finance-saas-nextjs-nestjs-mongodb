@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Spinner } from './ui/spinner';
 import * as Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
-import { fetchTransactionsList, getChartOptions } from '@/utils/helpers';
+import { fetchTransactionsList, formatAmount, getChartOptions } from '@/utils/helpers';
 
 const Expense = () => {
   const [loading, setLoading] = useState(false);
@@ -126,36 +126,34 @@ const Expense = () => {
             </div>
           </div>
 
-          <div className='border border-gray-300 mt-6 py-6 px-6 rounded-3xl flex-1 overflow-y-auto no-scrollbar'>
+          <div className='border border-gray-300 mt-4 py-6 px-6 rounded-3xl flex-1 overflow-y-auto no-scrollbar'>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-10'>
               {expenseList.map((expense: ITransactionData, index: number) => (
-                <div key={index} className='flex gap-2 justify-between items-center'>
-                  <div className='flex gap-2'>
-                    <span className='bg-gray-100 shadow-2xl text-2xl w-12 h-12 rounded-full flex items-center justify-center'>
+                <div key={index} className='flex gap-4 justify-between items-center min-w-0'>
+                  <div className='flex gap-2 min-w-0 flex-1 items-center'>
+                    <span className='bg-gray-100 shadow-2xl text-2xl w-12 h-12 rounded-full flex items-center justify-center shrink-0'>
                       {expense.emoji}
                     </span>
-                    <div className='flex flex-col'>
-                      <span className='font-medium'>{expense.title}</span>
-                      <span className='text-gray-500'>{expense.category}</span>
+                    <div className='flex flex-col min-w-0'>
+                      <span className='font-medium truncate'>{expense.title}</span>
+                      <span className='text-gray-500 text-sm truncate'>{expense.category}</span>
                       <span className='text-xs text-gray-400 font-medium'>
                         {expense.date ? new Date(expense.date).toLocaleDateString() : ""}
                       </span>
                     </div>
                   </div>
-                  <div className='flex items-center justify-center gap-3'>
-                    <div className='flex items-center justify-center gap-2 h-fit bg-red-100 rounded-md px-4 py-1'>
-                      <span className='text-red-800 font-medium'>- ${expense.amount}</span>
-                      <TrendingDown className='w-4 h-4 text-red-800 font-bold' />
+                  <div className='flex items-center justify-center gap-3 shrink-0'>
+                    <div className='flex items-center justify-center gap-2 h-fit bg-red-100 rounded-md px-4 py-1.5'>
+                      <span className='text-red-800 font-medium whitespace-nowrap'>- ${formatAmount(Number(expense.amount) || 0)}</span>
+                      <TrendingDown className='w-4 h-4 text-red-800 font-bold shrink-0' />
                     </div>
                     <div className='flex items-center justify-center gap-2'>
-                      <SquarePen
-                        onClick={() => handleUpdateIcon(expense)}
-                        className='w-5 h-5 text-gray-500 cursor-pointer'
-                      />
-                      <Trash2
-                        className='text-red-400 w-5 h-5 cursor-pointer'
-                        onClick={() => handleDeleteExpense(expense._id!)}
-                      />
+                        <div className='p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors' onClick={() => handleUpdateIcon(expense)}>
+                            <SquarePen className='w-5 h-5 text-gray-500'/>
+                        </div>
+                        <div className='p-2 hover:bg-red-50 rounded-full cursor-pointer transition-colors' onClick={() => handleDeleteExpense(expense._id!)}>
+                            <Trash2 className='text-red-400 w-5 h-5'/>
+                        </div>
                     </div>
                   </div>
                 </div>

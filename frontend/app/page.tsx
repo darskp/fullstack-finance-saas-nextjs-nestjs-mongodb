@@ -1,7 +1,8 @@
 import Dashboard from "@/components/Dashboard";
+import WithAuth from '@/hoc/WithAuth';
 
-export default function App() {
-  return (
-   <Dashboard/>
-  );
-}
+const App = async() => {
+    return(<Dashboard/>)
+};
+
+export default WithAuth(App);

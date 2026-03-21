@@ -1,6 +1,6 @@
 import Transactions from '@/components/Transactions'
-import React from 'react'
+import WithAuth from '@/hoc/WithAuth'
 
 const TransactionsPage = () => <Transactions/>
 
-export default TransactionsPage
+export default WithAuth(TransactionsPage)

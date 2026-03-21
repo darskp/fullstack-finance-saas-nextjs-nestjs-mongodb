@@ -10,7 +10,7 @@ import { Spinner } from './ui/spinner';
 import { SquarePen, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import * as Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
-import { fetchTransactionsList, getChartOptions, tableColumns } from '@/utils/helpers';
+import { fetchTransactionsList, formatAmount, getChartOptions, tableColumns } from '@/utils/helpers';
 import { Button } from './ui/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 
@@ -153,49 +153,7 @@ const Transactions = () => {
                         </div>
                     </div>
 
-                    {/* <div className='border border-gray-300 py-6 px-6 rounded-3xl flex-1 overflow-y-auto no-scrollbar'>
-                        <div className='grid grid-cols-1 lg:grid-cols-2 gap-10'>
-                            {transactionList.map((transaction: ITransactionData, index: number) => (
-                                <div key={index} className='flex gap-2 justify-between items-center'>
-                                    <div className='flex gap-2'>
-                                        <span className='bg-gray-100 shadow-2xl text-2xl w-12 h-12 rounded-full flex items-center justify-center'>
-                                            {transaction.emoji}
-                                        </span>
-                                        <div className='flex flex-col'>
-                                            <span className='font-medium'>{transaction.title}</span>
-                                            <span className='text-gray-500'>{transaction.category}</span>
-                                            <span className='text-xs text-gray-400 font-medium'>
-                                                {transaction.date ? new Date(transaction.date).toLocaleDateString() : ""}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className='flex items-center justify-center gap-3'>
-                                        <div className={`flex items-center justify-center gap-2 h-fit rounded-md px-4 py-1 ${transaction.transactionType === 'Income' ? 'bg-green-100' : 'bg-red-100'}`}>
-                                            <span className={`${transaction.transactionType === 'Income' ? 'text-green-800' : 'text-red-800'} font-medium`}>
-                                                {transaction.transactionType === 'Income' ? '+' : '-'} ${transaction.amount}
-                                            </span>
-                                            {transaction.transactionType === 'Income' ? (
-                                                <TrendingUp className='w-4 h-4 text-green-800 font-bold' />
-                                            ) : (
-                                                <TrendingDown className='w-4 h-4 text-red-800 font-bold' />
-                                            )}
-                                        </div>
-                                        <div className='flex items-center justify-center gap-2'>
-                                            <SquarePen
-                                                onClick={() => handleEditIcon(transaction)}
-                                                className='w-5 h-5 text-gray-500 cursor-pointer'
-                                            />
-                                            <Trash2
-                                                className='text-red-400 w-5 h-5 cursor-pointer'
-                                                onClick={() => handleDeleteTransaction(transaction._id!, transaction.transactionType!)}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div> */}
-                    <div className='border border-gray-300 mt-6 py-6 px-6 rounded-3xl flex-1 overflow-y-auto no-scrollbar'>
+                    <div className='border border-gray-300 mt-4 py-6 px-6 rounded-3xl flex-1 overflow-y-auto no-scrollbar'>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -211,28 +169,26 @@ const Transactions = () => {
                                     tableColumns.length > 0 && transactionList.map((transaction: ITransactionData) => (
                                     <TableRow key={transaction._id}>
                                         <TableCell className='text-2xl'>{transaction.emoji}</TableCell>
-                                        <TableCell className='font-medium'>{transaction.title}</TableCell>
+                                        <TableCell className='font-medium max-w-[200px] truncate' title={transaction.title}>{transaction.title}</TableCell>
                                         <TableCell>
-                                            <span className={`px-2 py-1 rounded-md text-sm font-medium ${transaction.transactionType === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                            <span className={`px-2 py-1 rounded-md text-sm font-medium whitespace-nowrap ${transaction.transactionType === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                                 {transaction.transactionType}
                                             </span>
                                         </TableCell>
-                                        <TableCell>{transaction.category}</TableCell>
-                                        <TableCell>{transaction.date ? new Date(transaction.date).toLocaleDateString() : ''}</TableCell>
-                                        <TableCell className={`font-semibold ${transaction.transactionType === 'Income' ? 'text-green-600' : 'text-red-600'}`}>
-                                            {transaction.transactionType === 'Income' ? '+' : '-'} ${transaction.amount}
+                                        <TableCell className='max-w-[150px] truncate' title={transaction.category}>{transaction.category}</TableCell>
+                                        <TableCell className='whitespace-nowrap'>{transaction.date ? new Date(transaction.date).toLocaleDateString() : ''}</TableCell>
+                                        <TableCell className={`font-semibold whitespace-nowrap ${transaction.transactionType === 'Income' ? 'text-green-600' : 'text-red-600'}`}>
+                                            {transaction.transactionType === 'Income' ? '+' : '-'} ${formatAmount(Number(transaction.amount) || 0)}
                                         </TableCell>
                                         <TableCell>
-                                            <SquarePen
-                                                onClick={() => handleEditIcon(transaction)}
-                                                className='w-5 h-5 text-gray-500 cursor-pointer hover:text-gray-700'
-                                            />
+                                            <div className='p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors w-fit' onClick={() => handleEditIcon(transaction)}>
+                                                <SquarePen className='w-5 h-5 text-gray-500 hover:text-gray-700' />
+                                            </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Trash2
-                                                className='text-red-400 w-5 h-5 cursor-pointer hover:text-red-600'
-                                                onClick={() => handleDeleteTransaction(transaction._id!, transaction.transactionType!)}
-                                            />
+                                            <div className='p-2 hover:bg-red-50 rounded-full cursor-pointer transition-colors w-fit' onClick={() => handleDeleteTransaction(transaction._id!, transaction.transactionType!)}>
+                                                <Trash2 className='text-red-400 w-5 h-5 hover:text-red-600' />
+                                            </div>
                                         </TableCell>
                                     </TableRow>))
                                 }

@@ -1,5 +1,18 @@
 import { ChartPoint, ChartTypes, ITransactionData, NewCategoriesDataType } from "./types"
 
+const formatAmount = (amount: number) => {
+    if (isNaN(amount) || amount === undefined || amount === null) return '0';
+    const absAmount = Math.abs(amount);
+    
+    if (absAmount >= 1e15) return (amount / 1e15).toFixed(1).replace(/\.0$/, '') + 'Q';
+    if (absAmount >= 1e12) return (amount / 1e12).toFixed(1).replace(/\.0$/, '') + 'T';
+    if (absAmount >= 1e9)  return (amount / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (absAmount >= 1e6)  return (amount / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (absAmount >= 1e3)  return (amount / 1e3).toFixed(1).replace(/\.0$/, '') + 'k';
+    
+    return amount.toString();
+}
+
 const fetchTransactionsList = (list: ITransactionData[]) => {
     const chartData = list.map((t: ITransactionData) => {
         return {
@@ -30,7 +43,7 @@ const fetchTransactionsList = (list: ITransactionData[]) => {
         p.x.toLocaleDateString("en-IN", {
             day: "2-digit",
             month: "short",
-            year: "numeric",
+            year: "2-digit",
         }))
 
     return {
@@ -57,7 +70,7 @@ const getChartOptions = (
             enabled: false,
         },
         chart: {
-            height: 250,
+            height: 200,
             backgroundColor: "transparent",
         },
         legend: {
@@ -97,7 +110,7 @@ const getChartOptions = (
                <span class="text-sm">${type === "Income" ? "Income:" : "Expense:"
                     }</span>
               </div>
-              <span class="font-medium ${textClass} text-sm">$${this.y}</span>
+              <span class="font-medium ${textClass} text-sm">$${formatAmount(Number(this.y) || 0)}</span>
           </div>          
         </div>
     `;
@@ -151,47 +164,36 @@ const getMonthlyIncomeExpense = async (
     incomeList: ITransactionData[],
     expenseList: ITransactionData[]
 ) => {
-    const formatMonth = (itemDate: Date) => {
-        const date = new Date(itemDate);
+    const monthData: Record<string, { income: number; expense: number; label: string }> = {};
 
-        return date.toLocaleString("default", {
-            month: "short",
-            year: "numeric",
-        });
+    const processItem = (item: ITransactionData, type: 'income' | 'expense') => {
+        if (!item?.date) return;
+        const d = new Date(item.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (!monthData[key]) {
+            monthData[key] = {
+                income: 0,
+                expense: 0,
+                label: d.toLocaleString("default", {
+                    month: "short",
+                    year: "2-digit",
+                })
+            };
+        }
+        monthData[key][type] += Number(item.amount);
     };
 
-    const monthMap: Record<string, { income: number; expense: number }> = {};
+    incomeList?.forEach((item) => processItem(item, 'income'));
+    expenseList?.forEach((item) => processItem(item, 'expense'));
 
-    incomeList?.forEach((item) => {
-        if (item.date) {
-            const month = formatMonth(item.date);
-            //mar 2026
-            if (!monthMap[month]) {
-                monthMap[month] = { income: 0, expense: 0 };
-            }
+    const sortedKeys = Object.keys(monthData).sort();
 
-            monthMap[month].income += Number(item.amount);
-        }
-    });
+    const categories = sortedKeys.map((key) => monthData[key].label);
+    const incomeSeries = sortedKeys.map((key) => monthData[key].income);
+    const expenseSeries = sortedKeys.map((key) => monthData[key].expense);
 
-    expenseList?.forEach((item) => {
-        if (item.date) {
-            const month = formatMonth(item.date);
-            if (!monthMap[month]) {
-                monthMap[month] = { income: 0, expense: 0 };
-            }
-
-            monthMap[month].expense += Number(item.amount);
-        }
-    });
-
-    const categories = Object?.keys(monthMap).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-
-    const incomeSeries = categories?.map((m) => monthMap[m].income);
-
-    const expenseSeries = categories?.map((m) => monthMap[m].expense);
     return { incomeSeries, expenseSeries, categories };
-
 }
 
 const getMoneyFlowOptions = (categories: string[],
@@ -202,7 +204,13 @@ const getMoneyFlowOptions = (categories: string[],
         chart: {
             type: "column",
             backgroundColor: "transparent",
-            marginTop: 60,
+            marginTop: 45,
+            height: 350,
+            scrollablePlotArea: {
+                minWidth: categories.length > 10 ? categories.length * 60 : undefined,
+                scrollPositionX: 1,
+                opacity: 0,
+            }
         },
         title: {
             text: "",
@@ -238,7 +246,7 @@ const getMoneyFlowOptions = (categories: string[],
             labels: {
                 style: { fontSize: "12px", fontWeight: "500", color: "#6a7282" },
                 formatter: function () {
-                    return `$${this.value}`;
+                    return `$${formatAmount(Number(this.value))}`;
                 },
             },
             gridLineColor: "#e0e0e0",
@@ -249,16 +257,17 @@ const getMoneyFlowOptions = (categories: string[],
             shadow: false,
             backgroundColor: "transparent",
             formatter: function () {
-                return `<div class="bg-white py-1 px-4 text-base font-medium border border-gray-300 rounded-3xl">$${this.y}</div>`;
+                return `<div class="bg-white py-1 px-4 text-base font-medium border border-gray-300 rounded-3xl">$${formatAmount(Number(this.y) || 0)}</div>`;
             },
         },
         plotOptions: {
             column: {
                 grouping: true,
                 borderWidth: 0,
-                pointWidth: 40,
-                borderRadius: 20,
-                groupPadding: 0.1,
+                maxPointWidth: 30,
+                borderRadius: 8,
+                groupPadding: 0.3,
+                pointPadding: 0.1,
                 states: {
                     hover: {
                         enabled: false,
@@ -300,18 +309,16 @@ const getPieChartOptions = (categorySeries: { name: string, y: number }[]): High
         chart: {
             type: "pie",
             backgroundColor: "transparent",
+            height: 350,
         },
         credits: {
             enabled: false,
         },
         title: {
-            text: "",
-        },
-        subtitle: {
             useHTML: true,
-            text: `<div>
-        <div class="text-gray-400 text-sm font-medium">Total Amount</div>
-        <div class="text-2xl font-semibold text-[#333]">$${totalValue}</div>
+            text: `<div style="text-align: center; line-height: 1.2;">
+        <div style="font-size: 11px; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Total</div>
+        <div style="font-size: 18px; font-weight: 700; color: #1f2937;">$${formatAmount(totalValue)}</div>
       </div>`,
             floating: true,
             verticalAlign: "middle",
@@ -323,10 +330,16 @@ const getPieChartOptions = (categorySeries: { name: string, y: number }[]): High
             align: "center",
             verticalAlign: "bottom",
             floating: false,
-            itemStyle: {
-                fontSize: "14px",
-                fontWeight: "500",
+            maxHeight: 100,
+            navigation: {
+                enabled: true,
             },
+            itemStyle: {
+                fontSize: "12px",
+                fontWeight: "500",
+                color: "#6a7282",
+            },
+            itemMarginBottom: 4,
         },
         tooltip: {
             shape: "rect",
@@ -335,13 +348,13 @@ const getPieChartOptions = (categorySeries: { name: string, y: number }[]): High
             backgroundColor: "transparent",
             formatter: function () {
                 return `<div class="bg-white py-1 px-4 text-base 
-        font-medium border border-gray-300 rounded-full">$${this.y}</div>`;
+        font-medium border border-gray-300 rounded-full">$${formatAmount(Number(this.y) || 0)}</div>`;
             },
         },
         plotOptions: {
             pie: {
-                innerSize: "80%",
-                size: "85%",
+                innerSize: "70%",
+                size: "80%",
                 borderWidth: 4,
                 borderColor: "#f4f4f4",
                 borderRadius: 20,
@@ -389,4 +402,4 @@ const getCategoryWiseValue = (transactions: ITransactionData[]) => {
 };
 
 
-export { getChartOptions, fetchTransactionsList, tableColumns, getMonthlyIncomeExpense, getMoneyFlowOptions, getPieChartOptions, getCategoryWiseValue }
+export { formatAmount, getChartOptions, fetchTransactionsList, tableColumns, getMonthlyIncomeExpense, getMoneyFlowOptions, getPieChartOptions, getCategoryWiseValue }

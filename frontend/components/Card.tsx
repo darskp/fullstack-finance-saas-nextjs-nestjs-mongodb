@@ -1,4 +1,5 @@
 import { CardProps } from '@/utils/types'
+import { formatAmount } from '@/utils/helpers'
 import Image from 'next/image'
 
 const Card = ({
@@ -15,8 +16,8 @@ const Card = ({
                 />
             </div>
             <div className='flex flex-col'>
-                <span className='text-sm text-gray-500 font-medium'>{title}</span>
-                <span className='font-bold text-xl lg:text-2xl'>${value}</span>
+                <span className='text-sm text-gray-500 font-medium whitespace-nowrap'>{title}</span>
+                <span className='font-bold text-xl lg:text-2xl whitespace-nowrap'>${formatAmount(value)}</span>
             </div>
         </div>
     )
