@@ -1,7 +1,8 @@
-import Image from "next/image";
+import Dashboard from "@/components/Dashboard";
+import WithAuth from '@/hoc/WithAuth';
 
-export default function Home() {
-  return (
-    <div><h2 className="text-black">App</h2></div>
-  );
-}
+const App = async() => {
+    return(<Dashboard/>)
+};
+
+export default WithAuth(App);
