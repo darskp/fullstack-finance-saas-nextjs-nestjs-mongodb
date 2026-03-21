@@ -1,4 +1,6 @@
-import { Controller, Post, Body, Headers, BadRequestException } from "@nestjs/common";
+import { Controller, Post, Body, Headers, BadRequestException, Req } from "@nestjs/common";
+import type { RawBodyRequest } from "@nestjs/common";
+import type { Request } from "express";
 import { ClerkService } from "./clerk.service";
 import type { WebhookEvent, WebhookResponse } from "./interfaces/webhook-event.interface";
 
@@ -9,8 +11,8 @@ export class ClerkController {
 
     @Post("register")
     async registerWebhook(
+        @Req() req: RawBodyRequest<Request>,
         @Body() body: WebhookEvent,
-        // @Req() req: Request,
         @Headers("svix-id") svixId: string,
         @Headers("svix-timestamp") svixTimestamp: string,
         @Headers("svix-signature") svixSignature: string,
@@ -19,10 +21,12 @@ export class ClerkController {
             throw new BadRequestException("Missing Svix webhook headers");
         }
 
-        const payload = JSON.stringify(body);
-        console.log("payload",payload);
-        
-        //   const payload = req.rawBody
+        if (!req.rawBody) {
+            throw new BadRequestException("Raw body not found");
+        }
+        const payload = req.rawBody.toString();
+        // console.log("payload", payload);
+
         const event = await this.clerkService.verifyWebhook(payload, {
             "svix-id": svixId,
             "svix-timestamp": svixTimestamp,
