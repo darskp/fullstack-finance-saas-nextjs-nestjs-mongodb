@@ -25,7 +25,7 @@ export class ClerkController {
             throw new BadRequestException("Raw body not found");
         }
         const payload = req.rawBody.toString();
-        // console.log("payload", payload);
+        console.log("Received Webhook Payload:", payload);
 
         const event = await this.clerkService.verifyWebhook(payload, {
             "svix-id": svixId,
