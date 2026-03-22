@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import SideBar from "@/components/sidebar";
 import { Toaster } from "sonner";
 import AxiosInterceptor from "@/components/AxiosInterceptor";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +38,9 @@ export default function RootLayout({
         >
           <AxiosInterceptor>
             <div className="h-screen flex w-screen">
-              <SideBar /> {children}
+              <SideBar />
+              {children}
+              <Analytics />
             </div>
             <Toaster />
           </AxiosInterceptor>
