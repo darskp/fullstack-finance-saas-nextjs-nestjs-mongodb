@@ -2,6 +2,12 @@
 
 Hosted Link: [Live Demo](https://expense-tracker-darswebdev.vercel.app/sign-in) <br />
 
+![Dashboard](https://raw.githubusercontent.com/darskp/fullstack-finance-saas-nextjs-nestjs-mongodb/refs/heads/master/screenshots/Dashboard.png)
+
+![Transactions Page](https://raw.githubusercontent.com/darskp/fullstack-finance-saas-nextjs-nestjs-mongodb/refs/heads/master/screenshots/Transactions%20Page.png)
+
+![Add Transaction](https://raw.githubusercontent.com/darskp/fullstack-finance-saas-nextjs-nestjs-mongodb/refs/heads/master/screenshots/Add%20Transaction.png)
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
