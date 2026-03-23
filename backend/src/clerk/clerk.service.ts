@@ -68,6 +68,8 @@ export class ClerkService {
       const imageUrl = data.image_url || null;
 
       try {
+        console.log("DEBUG: Webhook data received:", JSON.stringify(data, null, 2));
+
         const existingByClerkId = await this.userModel.findOne({ clerkId: data.id });
         if (existingByClerkId) {
           console.log(`User with clerkId ${data.id} already exists`);
@@ -82,12 +84,15 @@ export class ClerkService {
           }
         }
 
-        const newUser = new this.userModel({
-          clerkId: data.id,
-          fullName,
-          email,      // null if not provided
-          imageUrl,   // null if not provided
-        });
+        const userPayload: any = {
+           clerkId: data.id,
+           fullName,
+        };
+
+        if (email) userPayload.email = email;
+        if (imageUrl) userPayload.imageUrl = imageUrl;
+
+        const newUser = new this.userModel(userPayload);
 
         await newUser.save();
 

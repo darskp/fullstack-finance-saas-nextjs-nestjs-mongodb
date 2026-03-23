@@ -16,7 +16,6 @@ export class User extends Document {
         type: String,
         unique: true,
         sparse: true,
-        default: null,
     })
     email: string | null;
 
