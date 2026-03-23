@@ -1,6 +1,6 @@
 # fullstack-finance-saas-nextjs-nestjs-mongodb
 
-Hosted Link: [Live Demo](https://expense-tracker-darswebdev.vercel.app/) <br />
+Hosted Link: [Live Demo](https://expense-tracker-darswebdev.vercel.app/sign-in) <br />
 
 ## Table of Contents
 - [Introduction](#introduction)
