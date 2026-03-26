@@ -14,5 +14,6 @@ import { User, UserSchema } from '../../schemas/user.schema';
   ],
   controllers: [IncomeController],
   providers: [IncomeService],
+  exports: [IncomeService],
 })
 export class IncomeModule { }

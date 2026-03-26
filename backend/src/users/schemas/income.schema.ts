@@ -23,6 +23,9 @@ export class Income extends Document {
 
     @Prop({ required: true, type: Date, trim: true })
     date: Date
+
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export const IncomeSchema = SchemaFactory.createForClass(Income);

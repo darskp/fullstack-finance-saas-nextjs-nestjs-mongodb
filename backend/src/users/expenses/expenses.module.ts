@@ -14,6 +14,7 @@ import { User, UserSchema } from '../schemas/user.schema';
     ],
     controllers: [ExpensesController],
     providers: [ExpensesService],
+    exports: [ExpensesService],
 })
 
 export class ExpensesModule { }

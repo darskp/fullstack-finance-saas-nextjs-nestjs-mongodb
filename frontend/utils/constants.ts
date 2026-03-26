@@ -1,5 +1,5 @@
 
-import { BadgeDollarSign, Home, TrendingDown, TrendingUp } from "lucide-react";
+import { BadgeDollarSign, Bot, Home, TrendingDown, TrendingUp } from "lucide-react";
 
 export const SIDEBAR_CONSTANTS = [
   {
@@ -22,6 +22,11 @@ export const SIDEBAR_CONSTANTS = [
     id: "/expense",
     title: "Expense",
     icon: TrendingDown,
+  },
+  {
+    id: "/ai-chat",
+    title: "AI Assistant",
+    icon: Bot,
   },
 ];
 

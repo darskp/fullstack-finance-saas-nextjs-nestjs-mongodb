@@ -7,6 +7,7 @@ import { IncomeModule } from './users/income/income/income.module';
 import { ExpensesModule } from './users/expenses/expenses.module';
 import { TransactionModule } from './users/transaction/transaction.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AiChatModule } from './ai-chat/ai-chat.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     IncomeModule,
     ExpensesModule,
     TransactionModule,
+    AiChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
